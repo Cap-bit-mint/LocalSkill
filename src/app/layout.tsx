@@ -1,8 +1,20 @@
 import type { Metadata, Viewport } from "next";
+import { ThemeProvider } from "@/components/theme-provider";
+import { ToastProvider } from "@/components/ui/toast";
 import "./globals.css";
 
-// Use CSS variables for fonts - define in globals.css
-// This avoids network dependencies during build
+const themeScript = `
+  (function() {
+    try {
+      var theme = localStorage.getItem('theme');
+      var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      var isDark = theme === 'dark' || (!theme && prefersDark);
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+      }
+    } catch (e) {}
+  })();
+`
 
 export const viewport: Viewport = {
   themeColor: [
@@ -13,15 +25,15 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "LocalSkill - AI-Ready 商家 Skill 平台",
+    default: "LocalSkill - 让AI帮你找好店",
     template: "%s | LocalSkill",
   },
-  description: "零代码生成 AI-Ready 商家 Skill。提交美团/大众点评链接，自动生成 MCP 标准的 Store Skill。",
-  keywords: ["AI", "Store Skill", "MCP", "美团", "商家", "本地生活"],
+  description: "5分钟让你的店铺被AI主动推荐。提交美团/大众点评链接，AI自动生成店铺介绍，让顾客问AI就能找到你。",
+  keywords: ["AI商家", "智能店铺", "本地商家", "美团", "大众点评", "AI推荐"],
   authors: [{ name: "LocalSkill Team" }],
   openGraph: {
-    title: "LocalSkill - AI-Ready 商家 Skill 平台",
-    description: "零代码生成 AI-Ready 商家 Skill",
+    title: "LocalSkill - 让AI帮你找好店",
+    description: "5分钟让你的店铺被AI主动推荐",
     type: "website",
   },
 };
@@ -32,8 +44,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN" className="h-full antialiased">
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+    <html lang="zh-CN" className="h-full antialiased" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
+      <body className="min-h-full flex flex-col font-sans [&_*]:font-sans">
+        <ThemeProvider>
+          <ToastProvider>
+            {children}
+          </ToastProvider>
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
