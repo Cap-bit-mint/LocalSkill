@@ -2,6 +2,8 @@
   "name": "localskill",
   "version": "0.1.0",
   "private": true,
+  "description": "让 AI 助手主动推荐你的店铺",
+  "homepage": "https://localskill.vercel.app",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
