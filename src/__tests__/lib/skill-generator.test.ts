@@ -90,7 +90,13 @@ describe('Skill Generator', () => {
       expect(json.description).toBeTruthy()
       expect(json.category).toBe('restaurant')
       expect(json.triggers).toBeInstanceOf(Array)
-      expect(json.capabilities).toBeInstanceOf(Array)
+      expect(json.capabilities).toBeInstanceOf(Object)
+      expect(json.capabilities.read).toBeInstanceOf(Array)
+      expect(json.capabilities.write).toBeInstanceOf(Array)
+      expect(json.safety).toBeInstanceOf(Object)
+      expect(json.safety.readonly).toBe(true)
+      expect(json.safety.humanVerificationRequired).toBe(true)
+      expect(json.tools).toBeInstanceOf(Array)
     })
 
     it('should have correct category template', () => {
@@ -98,7 +104,24 @@ describe('Skill Generator', () => {
       const jsonStr = generateSkillJson(restaurantMerchant)
       const json = JSON.parse(jsonStr)
 
-      expect(json.capabilities).toContain('查询菜单和价格')
+      expect(json.capabilities.read).toContain('query_address')
+    })
+
+    it('should include fabrication forbidden list', () => {
+      const jsonStr = generateSkillJson(mockMerchant)
+      const json = JSON.parse(jsonStr)
+
+      expect(json.safety.fabricationForbidden).toContain('price')
+      expect(json.safety.fabricationForbidden).toContain('business_hours_special')
+      expect(json.safety.warnings).toBeInstanceOf(Array)
+    })
+
+    it('should have readonly capabilities', () => {
+      const jsonStr = generateSkillJson(mockMerchant)
+      const json = JSON.parse(jsonStr)
+
+      expect(json.capabilities.write).toHaveLength(0)
+      expect(json.tools.every((t: { readOnly: boolean }) => t.readOnly)).toBe(true)
     })
   })
 
